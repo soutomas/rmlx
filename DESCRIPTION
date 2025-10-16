@@ -1,9 +1,9 @@
 Package: pmxmlx
-Title: Convenient Functions for Processing Modelling Results from Monolix
+Title: Convenient Functions for Processing of Monolix Results 
 Version: 0.0.0.9000
 Authors@R: 
     person("Tomas", "Sou", , "tomas.sou@carexer.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: A collection of functions to facilitate processing of Monolix results.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
