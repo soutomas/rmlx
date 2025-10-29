@@ -4,10 +4,12 @@
 \alias{compare_runs}
 \title{Compare OFV and parameters of selected runs}
 \usage{
-compare_runs(runnums, ifOFV = TRUE, ifParam = TRUE)
+compare_runs(runnums, path = ".", ifOFV = TRUE, ifParam = TRUE)
 }
 \arguments{
 \item{runnums}{\verb{<chr>} Partial model file names of the model files}
+
+\item{path}{\verb{<chr>} Path to model directory for \link{get_mlx}}
 
 \item{ifOFV}{\verb{<lgl>} \code{TRUE} to return objective function values}
 

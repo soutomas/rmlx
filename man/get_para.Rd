@@ -16,5 +16,7 @@ A data frame containing the parameter values of the model run.
 Get parameter results of a Monolix model
 }
 \examples{
+\dontrun{
 get_para("r01_model.mlxtran")
+}
 }

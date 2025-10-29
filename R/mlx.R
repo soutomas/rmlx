@@ -12,10 +12,11 @@
 # - na 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Global variables 
-utils::globalVariables(
-  c("Values","Value","value",
-    "CV","PARA","OFV","AIC","BIC","BICc","X2","X3","parameter")
-)
+utils::globalVariables(c(
+  "Values","Value","value",
+  "CV","PARA","OFV","AIC","BIC","BICc",
+  "X2","X3","parameter"
+))
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #' Run Monolix model file using command line 
 #'
@@ -56,9 +57,11 @@ run_mlx_cmd = function(mlx_tran,mlx_dir=NULL,wait=TRUE){
 #' @return A character vector containing the names of the model files.
 #' @export
 #' @examples
+#' \dontrun{
 #' mlx_path = "CLOU064C1/mas/mas_1/model/pgm_001/Task_02_REMODEL_Sim_PopPK_plan/runs" 
 #' get_mlx(mlx_path)
-get_mlx = function(path="",ifall=TRUE){
+#' }
+get_mlx = function(path=".",ifall=TRUE){
   if(!ifall) {
     mlxruns = select.list(dir(path=path,pattern=".mlxtran$",full.names=T), multiple=T) 
   } else {
@@ -75,7 +78,9 @@ get_mlx = function(path="",ifall=TRUE){
 #' @return The file name of the population parameters of the model run. 
 #' @export
 #' @examples
+#' \dontrun{
 #' get_parafname("r01_model.mlxtran")
+#' }
 get_parafname = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   out = file.path(fdirname,"populationParameters.txt")
@@ -88,7 +93,9 @@ get_parafname = function(mlxrun){
 #' @return The file name of the summary file of the model run. 
 #' @export
 #' @examples
+#' \dontrun{
 #' get_summfname("r01_model.mlxtran")
+#' }
 get_summfname = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   out = file.path(fdirname,"summary.txt")
@@ -101,7 +108,9 @@ get_summfname = function(mlxrun){
 #' @return The file name of the objective function values of the model run. 
 #' @export
 #' @examples
+#' \dontrun{
 #' get_ofv("r01_model.mlxtran")
+#' }
 get_ofv = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   fname = get_summfname(mlxrun)
@@ -134,7 +143,9 @@ get_ofv = function(mlxrun){
 #' @return A data frame containing the parameter values of the model run.
 #' @export
 #' @examples
+#' \dontrun{
 #' get_para("r01_model.mlxtran")
+#' }
 get_para = function(mlxrun){
   fname = get_parafname(mlxrun) 
   if(!file.exists(fname)) return(paste0("No results for: ",basename(mlxrun),"\n"))
@@ -286,8 +297,10 @@ compare_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' Compare OFV and parameters of selected runs 
 #'
 #' @param runnums `<chr>` Partial model file names of the model files
+#' @param path `<chr>` Path to model directory for [get_mlx]
 #' @param ifOFV `<lgl>` `TRUE` to return objective function values 
 #' @param ifParam `<lgl>` `TRUE` to return parameter values 
+#'
 #' @returns A list containing the OFV and parameter values of all models 
 #' @export
 #' @examples
@@ -296,9 +309,10 @@ compare_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' compare_runs("/r01|/r02") # model names include "/r01" and "/r02"
 #' compare_runs("^r01|^r02") # model names starting with "r01" and "r02"
 #' }
-compare_runs = function(runnums,ifOFV=TRUE,ifParam=TRUE){
+compare_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE){
   # Get all runs in the directory 
-  mlxruns = get_mlx() 
+  mlxruns = get_mlx(path) 
+  if(length(mlxruns)==0) stop("No models found!")
   # Select runs matched by regular expression 
   runs = grep(runnums,mlxruns,value=TRUE) |> stringr::str_sort(numeric=TRUE) 
   # Get all OFVs 
@@ -306,7 +320,7 @@ compare_runs = function(runnums,ifOFV=TRUE,ifParam=TRUE){
   if(ifOFV) ofvs = get_allofv(runs,sortAIC=FALSE) 
   # Get all parameters 
   paras = NULL
-  if(ifParam) paras = compare_allpara(runs,rse=TRUE) 
-  out = list(ofvs,paras)
+  if(ifParam) paras = compare_allpara(runs,rse=TRUE)
+  out = list(ofvs,paras) 
   return(out)
 } 

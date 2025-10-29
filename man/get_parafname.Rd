@@ -16,5 +16,7 @@ The file name of the population parameters of the model run.
 Get population parameter file names of a Monolix model
 }
 \examples{
+\dontrun{
 get_parafname("r01_model.mlxtran")
+}
 }

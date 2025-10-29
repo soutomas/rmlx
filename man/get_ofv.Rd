@@ -16,5 +16,7 @@ The file name of the objective function values of the model run.
 Get summary file names of a Monolix model
 }
 \examples{
+\dontrun{
 get_ofv("r01_model.mlxtran")
+}
 }

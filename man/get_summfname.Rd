@@ -16,5 +16,7 @@ The file name of the summary file of the model run.
 Get summary file names of a Monolix model
 }
 \examples{
+\dontrun{
 get_summfname("r01_model.mlxtran")
+}
 }
