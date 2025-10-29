@@ -294,7 +294,7 @@ compare_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 } 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#' Compare OFV and parameters of selected runs 
+#' Examine objective function and parameter values of selected runs 
 #'
 #' @param runnums `<chr>` Partial model file names of the model files
 #' @param path `<chr>` Path to model directory for [get_mlx]
@@ -306,10 +306,10 @@ compare_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' @examples
 #' \dontrun{
 #' # Model files are matched by regular expression 
-#' compare_runs("/r01|/r02") # model names include "/r01" and "/r02"
-#' compare_runs("^r01|^r02") # model names starting with "r01" and "r02"
+#' exam_runs("/r01|/r02") # model names include "/r01" and "/r02"
+#' exam_runs("^r01|^r02") # model names starting with "r01" and "r02"
 #' }
-compare_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE){
+exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE){
   # Get all runs in the directory 
   mlxruns = get_mlx(path) 
   if(length(mlxruns)==0) stop("No models found!")

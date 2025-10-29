@@ -2,7 +2,7 @@
 
 export(compare_allpara)
 export(compare_para)
-export(compare_runs)
+export(exam_runs)
 export(get_allofv)
 export(get_mlx)
 export(get_ofv)
