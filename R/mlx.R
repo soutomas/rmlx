@@ -3,7 +3,7 @@
 # Use      : Convenient Functions for Processing of Monolix Results 
 # Author   : Tomas Sou (souto1)
 # Created  : 2025-10-16
-# Updated  : 2025-10-29
+# Updated  : 2025-10-30
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Notes 
 # - na
@@ -300,7 +300,6 @@ compare_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' @param path `<chr>` Path to model directory for [get_mlx]
 #' @param ifOFV `<lgl>` `TRUE` to return objective function values 
 #' @param ifParam `<lgl>` `TRUE` to return parameter values 
-#'
 #' @returns A list containing the OFV and parameter values of all models 
 #' @export
 #' @examples
@@ -315,12 +314,12 @@ exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE){
   if(length(mlxruns)==0) stop("No models found!")
   # Select runs matched by regular expression 
   runs = grep(runnums,mlxruns,value=TRUE) |> stringr::str_sort(numeric=TRUE) 
-  # Get all OFVs 
-  ofvs = NULL
-  if(ifOFV) ofvs = get_allofv(runs,sortAIC=FALSE) 
+  # Get all OFVs
+  ofv = NULL
+  if(ifOFV) ofv = get_allofv(runs,sortAIC=FALSE) 
   # Get all parameters 
-  paras = NULL
-  if(ifParam) paras = compare_allpara(runs,rse=TRUE)
-  out = list(ofvs,paras) 
+  para = NULL
+  if(ifParam) para = compare_allpara(runs,rse=TRUE)
+  out = list(ofv=ofv,para=para) 
   return(out)
 } 
