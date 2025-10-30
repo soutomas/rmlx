@@ -6,7 +6,7 @@
 \alias{rmlx-package}
 \title{rmlx: Convenient Functions for Processing of Monolix Results}
 \description{
-A collection of functions to facilitate processing of Monolix results.
+A collection of functions to facilitate the processing of Monolix results. Common tasks include getting objective function values, showing parameter estimates and compiling results from multiple runs for easy comparison.
 }
 \author{
 \strong{Maintainer}: Tomas Sou \email{tomas.sou@carexer.com} [copyright holder]
