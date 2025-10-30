@@ -1,9 +1,9 @@
 Package: rmlx
-Title: Convenient Functions for Processing of Monolix Results 
+Title: Convenient Functions for Modelling in Monolix 
 Version: 0.0.0.9000
 Authors@R: 
     person("Tomas", "Sou", , "tomas.sou@carexer.com", role = c("aut", "cre", "cph"))
-Description: A collection of functions to facilitate the processing of Monolix results.
+Description: A collection of functions to facilitate modelling in Monolix.
     Common tasks include getting objective function values, showing parameter estimates
     and compiling results from multiple runs for easy comparison. 
 License: MIT + file LICENSE
