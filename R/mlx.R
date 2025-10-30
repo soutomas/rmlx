@@ -191,6 +191,7 @@ get_allofv = function(mlxruns, sortAIC=FALSE){
 #'
 #' @param mlxruns `<chr>` A vector containing the model file names. 
 #' @returns All parameter values 
+#' @export
 #' @examples
 #' \dontrun{
 #' get_allpara("r01_model.mlxtran")
@@ -202,7 +203,7 @@ get_allpara = function(mlxruns){
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#' Compare parameters of two runs 
+#' Compare parameters of two model runs 
 #'
 #' @param addto `<dfr>` Output from previous run to add to if any. 
 #' @param run1,run2 `<chr>` Partial model names to by matched by regular expression 
@@ -213,9 +214,9 @@ get_allpara = function(mlxruns){
 #' @export
 #' @examples
 #' \dontrun{
-#' compare_para(mlxruns=mlxruns) 
+#' see_para(mlxruns=mlxruns) 
 #' }
-compare_para = function(addto=NULL,run1=NA,run2=NA,rse=TRUE,cv=FALSE,mlxruns){
+see_para = function(addto=NULL,run1=NA,run2=NA,rse=TRUE,cv=FALSE,mlxruns){
   run1n = grep(paste0("/",run1),mlxruns,value=TRUE) 
   run2n = grep(paste0("/",run2),mlxruns,value=TRUE) 
   runs = run1n 
@@ -272,22 +273,22 @@ compare_para = function(addto=NULL,run1=NA,run2=NA,rse=TRUE,cv=FALSE,mlxruns){
 #' @export
 #' @examples
 #' \dontrun{
-#' compare_allpara("r01_model.mlxtran") 
+#' see_allpara("r01_model.mlxtran") 
 #' }
-compare_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
+see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
   # extract run number 
   # runs = substr(mlxruns,1,3) 
   runs = 
     stringr::str_extract(basename(mlxruns),"^.*?[_]") |> 
     stringr::str_sort(numeric=TRUE) |> 
     stringr::str_remove("_")
-  out = compare_para(run1=runs[1],rse=rse,cv=cv,mlxruns=mlxruns) 
+  out = see_para(run1=runs[1],rse=rse,cv=cv,mlxruns=mlxruns) 
   if(length(runs)==1) return(out = out |> tibble::rowid_to_column("ROW"))
-  out = compare_para(run1=runs[1],run2=runs[2],rse=rse,cv=cv,mlxruns=mlxruns)
+  out = see_para(run1=runs[1],run2=runs[2],rse=rse,cv=cv,mlxruns=mlxruns)
   if(length(runs)==2) return(out = out |> tibble::rowid_to_column("ROW"))
   if(length(runs)>2){ 
     for(i in runs[-(1:2)]){
-      out = compare_para(addto=out,run1=i,rse=rse,cv=cv,mlxruns=mlxruns) 
+      out = see_para(addto=out,run1=i,rse=rse,cv=cv,mlxruns=mlxruns) 
     }
     return(out = out |> tibble::rowid_to_column("ROW"))
   }
@@ -319,7 +320,7 @@ exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE){
   if(ifOFV) ofv = get_allofv(runs,sortAIC=FALSE) 
   # Get all parameters 
   para = NULL
-  if(ifParam) para = compare_allpara(runs,rse=TRUE)
+  if(ifParam) para = see_allpara(runs,rse=TRUE)
   out = list(ofv=ofv,para=para) 
   return(out)
 } 
