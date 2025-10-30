@@ -124,7 +124,8 @@ get_ofv = function(mlxrun){
     ) 
     return(ofvs)
   } 
-  ofvs = readr::read_fwf(fname,readr::fwf_widths(c(41,14,9)),show_col_types=F) |>
+  ofvs = 
+    readr::read_fwf(fname,readr::fwf_widths(c(41,14,9)),show_col_types=FALSE) |>
     dplyr::filter(grepl("OFV|AIC|BICc|BIC",X2)) |> 
     dplyr::mutate(X3 = as.numeric(X3)) |> 
     # mutate(X3 = tibble::num(X3,digits=2)) |> 
@@ -149,7 +150,7 @@ get_ofv = function(mlxrun){
 get_para = function(mlxrun){
   fname = get_parafname(mlxrun) 
   if(!file.exists(fname)) return(paste0("No results for: ",basename(mlxrun),"\n"))
-  para = readr::read_csv(fname) |> 
+  para = readr::read_csv(fname,show_col_types=FALSE) |> 
     dplyr::select(
       PARA = parameter, 
       Value = value, 
