@@ -4,9 +4,9 @@
 \name{rmlx-package}
 \alias{rmlx}
 \alias{rmlx-package}
-\title{rmlx: Convenient Functions for Modelling in Monolix}
+\title{rmlx: Convenient Functions for Monolix Modelling}
 \description{
-A collection of functions to facilitate modelling in Monolix. Common tasks include getting objective function values, showing parameter estimates and compiling results from multiple runs for easy comparison.
+A collection of convenient functions to facilitate modelling with Monolix. Common tasks include getting objective function values, showing parameter estimates and compiling results from multiple runs for easy comparison.
 }
 \author{
 \strong{Maintainer}: Tomas Sou \email{tomas.sou@carexer.com} [copyright holder]
