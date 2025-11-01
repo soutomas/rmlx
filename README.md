@@ -10,7 +10,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The goal of rmlx is to facilitate the Modelling modelling workflow.
+The goal of rmlx is to facilitate modelling workflow with Monolix.
 
 ## Citation
 
