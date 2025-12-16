@@ -17,26 +17,6 @@ The goal of rmlx is to facilitate the Modelling modelling workflow.
 Sou T (2025). *rmlx: Convenient Functions for Monolix Modelling*. R
 package version 0.0.0.9000, <https://github.com/soutomas/rmlx>.
 
-``` r
-citation("rmlx")
-#> To cite package 'rmlx' in publications use:
-#> 
-#>   Sou T (2025). _rmlx: Convenient Functions for Monolix Modelling_. R
-#>   package version 0.0.0.9000, commit
-#>   9cb7d6b92bab2f990eb8a42e6fec6a9b1f4f2ea6,
-#>   <https://github.com/soutomas/rmlx>.
-#> 
-#> A BibTeX entry for LaTeX users is
-#> 
-#>   @Manual{,
-#>     title = {rmlx: Convenient Functions for Monolix Modelling},
-#>     author = {Tomas Sou},
-#>     year = {2025},
-#>     note = {R package version 0.0.0.9000, commit 9cb7d6b92bab2f990eb8a42e6fec6a9b1f4f2ea6},
-#>     url = {https://github.com/soutomas/rmlx},
-#>   }
-```
-
 ## Installation
 
 You can install the development version of rmlx from
