@@ -7,16 +7,16 @@
 exam_runs(runnums, path = ".", ifOFV = TRUE, ifParam = TRUE)
 }
 \arguments{
-\item{runnums}{\verb{<chr>} Partial model file names of the model files}
+\item{runnums}{\verb{<chr>} Partial model file names of the model files.}
 
-\item{path}{\verb{<chr>} Path to model directory for \link{get_mlx}}
+\item{path}{\verb{<chr>} Path to model directory for \link{get_mlx}.}
 
-\item{ifOFV}{\verb{<lgl>} \code{TRUE} to return objective function values}
+\item{ifOFV}{\verb{<lgl>} \code{TRUE} to return objective function values.}
 
-\item{ifParam}{\verb{<lgl>} \code{TRUE} to return parameter values}
+\item{ifParam}{\verb{<lgl>} \code{TRUE} to return parameter values.}
 }
 \value{
-A list containing the OFV and parameter values of all models
+A list containing the OFV and parameter values of the selected models.
 }
 \description{
 Examine objective function and parameter values of selected runs
@@ -24,6 +24,7 @@ Examine objective function and parameter values of selected runs
 \examples{
 \dontrun{
 # Model files are matched by regular expression 
+exam_runs("r01|r02") # model names include "r01" and "r02"
 exam_runs("/r01|/r02") # model names include "/r01" and "/r02"
 exam_runs("^r01|^r02") # model names starting with "r01" and "r02"
 }

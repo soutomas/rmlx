@@ -3,7 +3,7 @@
 # Use      : Convenient Functions for Processing of Monolix Results 
 # Author   : Tomas Sou (souto1)
 # Created  : 2025-10-16
-# Updated  : 2025-10-30
+# Updated  : 2026-03-04 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Notes 
 # - na
@@ -264,17 +264,40 @@ see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 } 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#' Examine objective function and parameter values of selected runs 
+#' See summary of run results as kables
 #'
-#' @param runnums `<chr>` Partial model file names of the model files
-#' @param path `<chr>` Path to model directory for [get_mlx]
-#' @param ifOFV `<lgl>` `TRUE` to return objective function values 
-#' @param ifParam `<lgl>` `TRUE` to return parameter values 
-#' @returns A list containing the OFV and parameter values of all models 
+#' @param runnums `<chr>` Starting string of Monolix run files separated by '|'.
+#' @param path `<chr>` Location of Monolix run files.
+#' @param ... Additional arguments for [exam_runs()]
+#' @returns A list containing the OFV and parameter values of the selected models.
 #' @export
 #' @examples
 #' \dontrun{
 #' # Model files are matched by regular expression 
+#' see_runs("r01|r02") # model names include "r01" and "r02"
+#' see_runs("/r01|/r02") # model names include "/r01" and "/r02"
+#' see_runs("^r01|^r02") # model names starting with "r01" and "r02"
+#' }
+see_runs = function(runnums,path=".",...){
+  out = exam_runs(runnums=runnums,path=path,...)
+  out$ofv  |> edar::kb() |> print()
+  out$para |> edar::kb() |> print()
+  invisible(out)
+}
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#' Examine objective function and parameter values of selected runs 
+#'
+#' @param runnums `<chr>` Partial model file names of the model files.
+#' @param path `<chr>` Path to model directory for [get_mlx].
+#' @param ifOFV `<lgl>` `TRUE` to return objective function values.
+#' @param ifParam `<lgl>` `TRUE` to return parameter values. 
+#' @returns A list containing the OFV and parameter values of the selected models.
+#' @export
+#' @examples
+#' \dontrun{
+#' # Model files are matched by regular expression 
+#' exam_runs("r01|r02") # model names include "r01" and "r02"
 #' exam_runs("/r01|/r02") # model names include "/r01" and "/r02"
 #' exam_runs("^r01|^r02") # model names starting with "r01" and "r02"
 #' }

@@ -26,15 +26,17 @@ utils::globalVariables(c(
 #' \dontrun{
 #' run_mlx_cmd("r01_model.mlxtran")
 #' }
-run_mlx_cmd = function(mlx_tran,mlx_dir=NULL,wait=TRUE){
-  mlx_opt = "; mlxbsub -V 2023 -N 2 -n 12 -p "
+run_mlx_cmd = function(mlx_dir,mlx_tran,wait=F){
+  # Options 
+  mlx_opt = "; mlxbsub -V 2023 -N 4 -n 12 -p "
   cmd = paste0("module purge; cd ",mlx_dir,mlx_opt,mlx_tran)
   out = system(cmd, intern=T)
   tstart = Sys.time()
   jobID = trimws(sub("bjobs", "", out[6]))
   print(out)
+  # Wait 
   if(wait){
-    # Wait until finish - max 72 hr / 4320 min 
+    # Wait until finish - max 4320 min (72 hr)
     jobID_done = paste0("ended(",jobID,")")
     cmd = paste0('bwait -t 4320 -w "',paste(jobID_done, collapse="&&"),'" ')
     print(cmd)
@@ -43,5 +45,6 @@ run_mlx_cmd = function(mlx_tran,mlx_dir=NULL,wait=TRUE){
     trun = difftime(tend, tstart, units="secs") |> as.double() |> round(2)
     cat("Job done! [sec]:", trun)  
   }
+  # Return 
   return(jobID)
 }
