@@ -3,7 +3,7 @@
 # Use      : Convenient Functions for Processing of Monolix Results 
 # Author   : Tomas Sou (souto1)
 # Created  : 2025-10-16
-# Updated  : 2026-03-04 
+# Updated  : 2026-04-15
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Notes 
 # - na
@@ -15,7 +15,8 @@
 utils::globalVariables(c(
   "Values","Value","value",
   "CV","PARA","OFV","AIC","BIC","BICc",
-  "X2","X3","parameter"
+  "X2","X3","parameter",
+  "run"
 ))
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #' Search for Monolix model files 
@@ -103,6 +104,51 @@ get_ofv = function(mlxrun){
     dplyr::rename(OFV=1,AIC=2,BICc=3,BIC=4) |>
     dplyr::mutate(RUN = basename(fdirname), .before=1) 
   return(ofvs)
+}
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#' Read results from all Monolix runs in convergement assessment  
+#'
+#' @param type `<chr>` Type of results to return. 
+#'   Accept one of the following: 
+#'   "ofv": OFV; 
+#'   "pop": Population parameters; 
+#'   "saem": SAEM convergence.  
+#' @param path `<chr>` Path to Monolix run. 
+#' @param mlxbase `<chr>` Monolix file name of the model for assessment. 
+#' @returns A data frame containing the selected results. 
+#' @export
+#' @examples
+#' \dontrun{
+#' path = "run"
+#' get_res_ca("ofv",path,"r01_base")
+#' }
+get_res_ca = function(type=c("ofv","pop","saem"),path,mlxbase){
+  type = match.arg(type)
+  # Get OFV 
+  fofv = "/LogLikelihood/logLikelihood.txt"
+  # Get parameters 
+  fpop = "/populationParameters.txt"
+  # Get SAEM
+  fsaem = "/ChartsData/Saem/CvParam.txt"
+  
+  # Type
+  txt = NULL
+  if(type=="ofv") txt = fofv
+  if(type=="pop") txt = fpop
+  if(type=="saem") txt = fsaem
+  
+  # List all Monolix files 
+  mlx_tran_all = list.files(path,".mlxtran")
+  mlx_name_all = tools::file_path_sans_ext(mlx_tran_all)
+  mlx_fpath_all = file.path(path,mlx_tran_all)
+  
+  # Output
+  mlxbase = tools::file_path_sans_ext(mlxbase)
+  omit = paste0(path,"|/",mlxbase,"_","|",txt)
+  fpath = gsub(".mlxtran",txt,mlx_fpath_all)
+  out = readr::read_csv(fpath,id="run") |> dplyr::mutate(run = gsub(omit,"",run))   
+  return(out)
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

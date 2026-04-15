@@ -3,7 +3,7 @@
 # Use      : Convenient Functions for Monolix Runs 
 # Author   : Tomas Sou (souto1)
 # Created  : 2025-10-30
-# Updated  : 2025-10-30
+# Updated  : 2026-04-15
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Notes 
 # - na
@@ -24,9 +24,9 @@ utils::globalVariables(c(
 #' @export
 #' @examples
 #' \dontrun{
-#' run_mlx_cmd("r01_model.mlxtran")
+#' run_mlx("r01_model.mlxtran")
 #' }
-run_mlx_cmd = function(mlx_dir,mlx_tran,wait=F){
+run_mlx = function(mlx_dir,mlx_tran,wait=F){
   # Options 
   mlx_opt = "; mlxbsub -V 2023 -N 4 -n 12 -p "
   cmd = paste0("module purge; cd ",mlx_dir,mlx_opt,mlx_tran)
