@@ -3,7 +3,6 @@
 # Use      : Convenient Functions for Processing of Monolix Results 
 # Author   : Tomas Sou (souto1)
 # Created  : 2025-10-16
-# Updated  : 2026-04-15
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Notes 
 # - na
@@ -22,7 +21,8 @@ utils::globalVariables(c(
 #' Search for Monolix model files 
 #'
 #' @param path `<chr>` Path to the directory of the model files. 
-#' @param ifall `<lgl>` `TRUE` to return all model files in the directory. 
+#' @param runnums `<chr>` String to search for in Monolix file names separated by '|'.
+#' @param man `<lgl>` `TRUE` to return all model files in the directory. 
 #' @return A character vector containing the names of the model files.
 #' @export
 #' @examples
@@ -30,13 +30,16 @@ utils::globalVariables(c(
 #' mlx_path = "CLOU064C1/mas/mas_1/model/pgm_001/Task_02_REMODEL_Sim_PopPK_plan/runs" 
 #' get_mlx(mlx_path)
 #' }
-get_mlx = function(path=".",ifall=TRUE){
-  if(!ifall) {
+get_mlx = function(path=".",runnums,man=FALSE){
+  # Manual selection 
+  if(man) {
     mlxruns = select.list(dir(path=path,pattern=".mlxtran$",full.names=T), multiple=T) 
   } else {
     mlxruns = dir(path=path,pattern=".mlxtran$",full.names=T)
   }
   mlxruns = gsub(".mlxtran","",mlxruns)
+  # Select runs matched by regular expression 
+  if(!missing(runnums)) mlxruns = grep(runnums,mlxruns,value=TRUE) |> stringr::str_sort(numeric=TRUE)   
   return(mlxruns)
 }
 
@@ -68,6 +71,7 @@ get_parafname = function(mlxrun){
 get_summfname = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   out = file.path(fdirname,"summary.txt")
+  return(out)
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -83,14 +87,17 @@ get_summfname = function(mlxrun){
 get_ofv = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   fname = get_summfname(mlxrun)
-  if(!file.exists(fname)){
+  len = 0
+  if(file.exists(fname)) len = readLines(fname) |> length()
+  if(!file.exists(fname) | len==0){
     ofvs = tibble::tibble(
-      RUN = mlxrun,
+      RUN = basename(fdirname),
       OFV = NA,
       AIC = NA,
       BIC = NA,
       BICc = NA,
     ) 
+    cat(paste0("No summary file for: ",basename(mlxrun),"\n"))
     return(ofvs)
   } 
   ofvs = 
@@ -163,7 +170,9 @@ get_res_ca = function(type=c("ofv","pop","saem"),path,mlxbase){
 #' }
 get_para = function(mlxrun){
   fname = get_parafname(mlxrun) 
-  if(!file.exists(fname)) return(paste0("No results for: ",basename(mlxrun),"\n"))
+  len = 0
+  if(file.exists(fname)) len = readLines(fname) |> length()  
+  if(!file.exists(fname)|len==0) return(paste0("No parameters for: ",basename(mlxrun),"\n"))
   para = readr::read_csv(fname,show_col_types=FALSE) |> 
     dplyr::select(
       PARA = parameter, 
@@ -183,20 +192,25 @@ get_para = function(mlxrun){
 #' Get objective function values of all model runs 
 #'
 #' @param mlxruns `<chr>` A vector containing the model file names. 
-#' @param sortAIC `<lgl>` `TRUE` to sort results by AIC values.
+#' @param sortby  `<chr>` Sort results by "OFV", "AIC", "BIC" or "BICc" values.
 #' @returns A data frame containing the objective function values of the models. 
 #' @export
 #' @examples
 #' \dontrun{
 #' get_allofv("r01_model.mlxtran")
 #'}
-get_allofv = function(mlxruns, sortAIC=FALSE){
-  allofv = purrr::map_df(mlxruns, get_ofv) |> 
+get_allofv = function(mlxruns, sortby=c("none","OFV","AIC","BIC","BICc")){
+  sortby = match.arg(sortby)
+  allofv = purrr::map_df(mlxruns, get_ofv)  
+  if(sortby=="OFV") allofv = allofv |> dplyr::arrange(OFV) 
+  if(sortby=="AIC") allofv = allofv |> dplyr::arrange(AIC) 
+  if(sortby=="BIC") allofv = allofv |> dplyr::arrange(BIC) 
+  if(sortby=="BICc") allofv = allofv |> dplyr::arrange(BICc) 
+  allofv = allofv |> 
     dplyr::mutate(dOFV=OFV-dplyr::lag(OFV), .after=OFV) |>
     dplyr::mutate(dAIC=AIC-dplyr::lag(AIC), .after=AIC) |>
     dplyr::mutate(dBICc=BICc-dplyr::lag(BICc), .after=BICc) |>
     dplyr::mutate(dBIC=BIC-dplyr::lag(BIC), .after=BIC) 
-  if(sortAIC) allofv = allofv |> dplyr::arrange(AIC) 
   allofv = allofv |> dplyr::mutate(ROW = dplyr::row_number(), .before=1) 
   return(allofv)
 }
@@ -310,9 +324,42 @@ see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 } 
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#' Examine objective function and parameter values of selected runs 
+#'
+#' @param runnums `<chr>` String to search for in Monolix file names separated by '|'.
+#' @param path `<chr>` Path to model directory for [get_mlx].
+#' @param ifOFV `<lgl>` `TRUE` to return objective function values.
+#' @param ifParam `<lgl>` `TRUE` to return parameter values. 
+#' @returns A list containing the OFV and parameter values of the selected models.
+#' @export
+#' @examples
+#' \dontrun{
+#' # Model files are matched by regular expression 
+#' exam_runs("r01|r02") # model names include "r01" and "r02"
+#' exam_runs("/r01|/r02") # model names include "/r01" and "/r02"
+#' exam_runs("^r01|^r02") # model names starting with "r01" and "r02"
+#' }
+exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("none","OFV","AIC","BIC","BICc")){
+  sortby = match.arg(sortby)  
+  # Get all runs in the directory 
+  mlxruns = get_mlx(path) 
+  if(length(mlxruns)==0) stop("No models found!")
+  # Select runs matched by regular expression 
+  runs = grep(runnums,mlxruns,value=TRUE) |> stringr::str_sort(numeric=TRUE) 
+  # Get all OFVs
+  ofv = NULL
+  if(ifOFV) ofv = get_allofv(runs,sortby=sortby) 
+  # Get all parameters 
+  para = NULL
+  if(ifParam) para = see_allpara(runs,rse=TRUE)
+  out = list(ofv=ofv,para=para) 
+  return(out)
+} 
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #' See summary of run results as kables
 #'
-#' @param runnums `<chr>` Starting string of Monolix run files separated by '|'.
+#' @param runnums `<chr>` String to search for in Monolix file names separated by '|'.
 #' @param path `<chr>` Location of Monolix run files.
 #' @param ... Additional arguments for [exam_runs()]
 #' @returns A list containing the OFV and parameter values of the selected models.
@@ -326,39 +373,8 @@ see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' }
 see_runs = function(runnums,path=".",...){
   out = exam_runs(runnums=runnums,path=path,...)
-  out$ofv  |> edar::kb() |> print()
-  out$para |> edar::kb() |> print()
+  out$ofv  |> kb() |> print()
+  out$para |> kb() |> print()
   invisible(out)
 }
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#' Examine objective function and parameter values of selected runs 
-#'
-#' @param runnums `<chr>` Partial model file names of the model files.
-#' @param path `<chr>` Path to model directory for [get_mlx].
-#' @param ifOFV `<lgl>` `TRUE` to return objective function values.
-#' @param ifParam `<lgl>` `TRUE` to return parameter values. 
-#' @returns A list containing the OFV and parameter values of the selected models.
-#' @export
-#' @examples
-#' \dontrun{
-#' # Model files are matched by regular expression 
-#' exam_runs("r01|r02") # model names include "r01" and "r02"
-#' exam_runs("/r01|/r02") # model names include "/r01" and "/r02"
-#' exam_runs("^r01|^r02") # model names starting with "r01" and "r02"
-#' }
-exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE){
-  # Get all runs in the directory 
-  mlxruns = get_mlx(path) 
-  if(length(mlxruns)==0) stop("No models found!")
-  # Select runs matched by regular expression 
-  runs = grep(runnums,mlxruns,value=TRUE) |> stringr::str_sort(numeric=TRUE) 
-  # Get all OFVs
-  ofv = NULL
-  if(ifOFV) ofv = get_allofv(runs,sortAIC=FALSE) 
-  # Get all parameters 
-  para = NULL
-  if(ifParam) para = see_allpara(runs,rse=TRUE)
-  out = list(ofv=ofv,para=para) 
-  return(out)
-} 
