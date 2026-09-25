@@ -97,7 +97,7 @@ get_ofv = function(mlxrun){
       BIC = NA,
       BICc = NA,
     ) 
-    cat(paste0("No summary file for: ",basename(mlxrun),"\n"))
+    cat(paste0("\nNo summary file for: ",basename(mlxrun),"\n"))
     return(ofvs)
   } 
   ofvs = 
@@ -172,7 +172,7 @@ get_para = function(mlxrun){
   fname = get_parafname(mlxrun) 
   len = 0
   if(file.exists(fname)) len = readLines(fname,warn=FALSE) |> length()  
-  if(!file.exists(fname)|len==0) return(paste0("No parameters for: ",basename(mlxrun),"\n"))
+  if(!file.exists(fname)|len==0) return(paste0("\nNo parameters for: ",basename(mlxrun),"\n"))
   para = readr::read_csv(fname,show_col_types=FALSE) |> 
     dplyr::select(
       PARA = parameter, 
