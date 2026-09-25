@@ -4,12 +4,14 @@
 \alias{get_mlx}
 \title{Search for Monolix model files}
 \usage{
-get_mlx(path = ".", ifall = TRUE)
+get_mlx(path = ".", runnums, man = FALSE)
 }
 \arguments{
 \item{path}{\verb{<chr>} Path to the directory of the model files.}
 
-\item{ifall}{\verb{<lgl>} \code{TRUE} to return all model files in the directory.}
+\item{runnums}{\verb{<chr>} String to search for in Monolix file names separated by '|'.}
+
+\item{man}{\verb{<lgl>} \code{TRUE} to return all model files in the directory.}
 }
 \value{
 A character vector containing the names of the model files.

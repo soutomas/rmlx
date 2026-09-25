@@ -88,7 +88,7 @@ get_ofv = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   fname = get_summfname(mlxrun)
   len = 0
-  if(file.exists(fname)) len = readLines(fname) |> length()
+  if(file.exists(fname)) len = readLines(fname,warn=FALSE) |> length()
   if(!file.exists(fname) | len==0){
     ofvs = tibble::tibble(
       RUN = basename(fdirname),
@@ -171,7 +171,7 @@ get_res_ca = function(type=c("ofv","pop","saem"),path,mlxbase){
 get_para = function(mlxrun){
   fname = get_parafname(mlxrun) 
   len = 0
-  if(file.exists(fname)) len = readLines(fname) |> length()  
+  if(file.exists(fname)) len = readLines(fname,warn=FALSE) |> length()  
   if(!file.exists(fname)|len==0) return(paste0("No parameters for: ",basename(mlxrun),"\n"))
   para = readr::read_csv(fname,show_col_types=FALSE) |> 
     dplyr::select(
@@ -192,7 +192,7 @@ get_para = function(mlxrun){
 #' Get objective function values of all model runs 
 #'
 #' @param mlxruns `<chr>` A vector containing the model file names. 
-#' @param sortby  `<chr>` Sort results by "OFV", "AIC", "BIC" or "BICc" values.
+#' @param sortby `<chr>` Sort results by: "none", "OFV", "AIC", "BICc".
 #' @returns A data frame containing the objective function values of the models. 
 #' @export
 #' @examples
@@ -329,6 +329,7 @@ see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' @param runnums `<chr>` String to search for in Monolix file names separated by '|'.
 #' @param path `<chr>` Path to model directory for [get_mlx].
 #' @param ifOFV `<lgl>` `TRUE` to return objective function values.
+#' @param sortby `<chr>` Sort results by: "none", "OFV", "AIC", "BICc".
 #' @param ifParam `<lgl>` `TRUE` to return parameter values. 
 #' @returns A list containing the OFV and parameter values of the selected models.
 #' @export
@@ -373,8 +374,8 @@ exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("none","
 #' }
 see_runs = function(runnums,path=".",...){
   out = exam_runs(runnums=runnums,path=path,...)
-  out$ofv  |> kb() |> print()
-  out$para |> kb() |> print()
+  out$ofv  |> edar::kb() |> print()
+  out$para |> edar::kb() |> print()
   invisible(out)
 }
 

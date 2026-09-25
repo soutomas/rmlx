@@ -4,12 +4,12 @@
 \alias{get_allofv}
 \title{Get objective function values of all model runs}
 \usage{
-get_allofv(mlxruns, sortAIC = FALSE)
+get_allofv(mlxruns, sortby = c("none", "OFV", "AIC", "BIC", "BICc"))
 }
 \arguments{
 \item{mlxruns}{\verb{<chr>} A vector containing the model file names.}
 
-\item{sortAIC}{\verb{<lgl>} \code{TRUE} to sort results by AIC values.}
+\item{sortby}{\verb{<chr>} Sort results by: "none", "OFV", "AIC", "BICc".}
 }
 \value{
 A data frame containing the objective function values of the models.

@@ -4,16 +4,24 @@
 \alias{exam_runs}
 \title{Examine objective function and parameter values of selected runs}
 \usage{
-exam_runs(runnums, path = ".", ifOFV = TRUE, ifParam = TRUE)
+exam_runs(
+  runnums,
+  path = ".",
+  ifOFV = TRUE,
+  ifParam = TRUE,
+  sortby = c("none", "OFV", "AIC", "BIC", "BICc")
+)
 }
 \arguments{
-\item{runnums}{\verb{<chr>} Partial model file names of the model files.}
+\item{runnums}{\verb{<chr>} String to search for in Monolix file names separated by '|'.}
 
 \item{path}{\verb{<chr>} Path to model directory for \link{get_mlx}.}
 
 \item{ifOFV}{\verb{<lgl>} \code{TRUE} to return objective function values.}
 
 \item{ifParam}{\verb{<lgl>} \code{TRUE} to return parameter values.}
+
+\item{sortby}{\verb{<chr>} Sort results by: "none", "OFV", "AIC", "BICc".}
 }
 \value{
 A list containing the OFV and parameter values of the selected models.

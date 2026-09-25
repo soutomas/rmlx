@@ -7,7 +7,7 @@
 see_runs(runnums, path = ".", ...)
 }
 \arguments{
-\item{runnums}{\verb{<chr>} Starting string of Monolix run files separated by '|'.}
+\item{runnums}{\verb{<chr>} String to search for in Monolix file names separated by '|'.}
 
 \item{path}{\verb{<chr>} Location of Monolix run files.}
 
