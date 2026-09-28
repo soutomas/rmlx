@@ -4,12 +4,12 @@
 \alias{run_mlx}
 \title{Run Monolix model file using command line}
 \usage{
-run_mlx(mlx_dir, mlx_tran, wait = F)
+run_mlx(mlx_tran, mlx_dir, wait = F)
 }
 \arguments{
-\item{mlx_dir}{\verb{<chr>} Location of the Monolix file.}
-
 \item{mlx_tran}{\verb{<chr>} File name of path of the Monolix file.}
+
+\item{mlx_dir}{\verb{<chr>} Location of the Monolix file.}
 
 \item{wait}{\verb{<lgl>} \code{TRUE} to wait for the run to finish.}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/res.R
 \name{get_ofv}
 \alias{get_ofv}
-\title{Get summary file names of a Monolix model}
+\title{Get OFV values from Monolix results}
 \usage{
 get_ofv(mlxrun)
 }
@@ -13,7 +13,7 @@ get_ofv(mlxrun)
 The file name of the objective function values of the model run.
 }
 \description{
-Get summary file names of a Monolix model
+Get OFV values from Monolix results
 }
 \examples{
 \dontrun{

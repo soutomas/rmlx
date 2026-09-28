@@ -15,7 +15,8 @@ utils::globalVariables(c(
   "Values","Value","value",
   "CV","PARA","OFV","AIC","BIC","BICc",
   "X2","X3","parameter",
-  "run"
+  "run",
+  "criteria","standardError"
 ))
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #' Search for Monolix model files 
@@ -44,38 +45,53 @@ get_mlx = function(path=".",runnums,man=FALSE){
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#' Get population parameter file names of a Monolix model 
+#' Get population parameter file name from Monolix results 
 #'
 #' @param mlxrun `<chr>` A Monolix file name. 
 #' @return The file name of the population parameters of the model run. 
 #' @export
 #' @examples
 #' \dontrun{
-#' get_parafname("r01_model.mlxtran")
+#' get_fname_para("r01_model.mlxtran")
 #' }
-get_parafname = function(mlxrun){
+get_fname_para = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   out = file.path(fdirname,"populationParameters.txt")
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#' Get summary file names of a Monolix model 
+#' Get summary file name from Monolix results  
 #'
 #' @param mlxrun `<chr>` A Monolix file name. 
 #' @return The file name of the summary file of the model run. 
 #' @export
 #' @examples
 #' \dontrun{
-#' get_summfname("r01_model.mlxtran")
+#' get_fname_summ("r01_model.mlxtran")
 #' }
-get_summfname = function(mlxrun){
+get_fname_summ = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
   out = file.path(fdirname,"summary.txt")
   return(out)
 }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#' Get summary file names of a Monolix model 
+#' Get log-likelihood file name from Monolix results 
+#'
+#' @param mlxrun `<chr>` A Monolix file name. 
+#' @return The file name of the population parameters of the model run. 
+#' @export
+#' @examples
+#' \dontrun{
+#' get_fname_ofv("r01_model.mlxtran")
+#' }
+get_fname_ofv = function(mlxrun){
+  fdirname = gsub(".mlxtran","",mlxrun) 
+  out = file.path(fdirname,"LogLikelihood","logLikelihood.txt")
+}
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#' Get OFV values from Monolix results 
 #'
 #' @param mlxrun `<chr>` A Monolix file name. 
 #' @return The file name of the objective function values of the model run. 
@@ -86,7 +102,7 @@ get_summfname = function(mlxrun){
 #' }
 get_ofv = function(mlxrun){
   fdirname = gsub(".mlxtran","",mlxrun) 
-  fname = get_summfname(mlxrun)
+  fname = get_fname_ofv(mlxrun)
   len = 0
   if(file.exists(fname)) len = readLines(fname,warn=FALSE) |> length()
   if(!file.exists(fname) | len==0){
@@ -97,19 +113,15 @@ get_ofv = function(mlxrun){
       BIC = NA,
       BICc = NA,
     ) 
-    cat(paste0("\nNo summary file for: ",basename(mlxrun),"\n"))
+    cat(paste0("\nNo log-likelihoood for: ",basename(mlxrun),"\n"))
     return(ofvs)
   } 
   ofvs = 
-    readr::read_fwf(fname,readr::fwf_widths(c(41,14,9)),show_col_types=FALSE) |>
-    dplyr::filter(grepl("OFV|AIC|BICc|BIC",X2)) |> 
-    dplyr::mutate(X3 = as.numeric(X3)) |> 
-    # mutate(X3 = tibble::num(X3,digits=2)) |> 
-    dplyr::mutate(across(where(is.double), ~round(.x, digits=2))) |> 
-    dplyr::select(X2,X3) |> 
-    tidyr::pivot_wider(names_from=X2,values_from=X3) |> 
-    dplyr::rename(OFV=1,AIC=2,BICc=3,BIC=4) |>
-    dplyr::mutate(RUN = basename(fdirname), .before=1) 
+    readr::read_csv(fname,show_col_types=FALSE) |>
+    dplyr::mutate(across(where(is.double), ~round(.x, digits=2))) |>
+    tidyr::pivot_wider(names_from=criteria,values_from=2) |>
+    dplyr::mutate(RUN = basename(fdirname), .before=1) |> 
+    dplyr::select(-standardError)
   return(ofvs)
 }
 
@@ -169,7 +181,7 @@ get_res_ca = function(type=c("ofv","pop","saem"),path,mlxbase){
 #' get_para("r01_model.mlxtran")
 #' }
 get_para = function(mlxrun){
-  fname = get_parafname(mlxrun) 
+  fname = get_fname_para(mlxrun) 
   len = 0
   if(file.exists(fname)) len = readLines(fname,warn=FALSE) |> length()  
   if(!file.exists(fname)|len==0) return(paste0("\nNo parameters for: ",basename(mlxrun),"\n"))
