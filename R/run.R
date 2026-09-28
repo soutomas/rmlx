@@ -3,7 +3,6 @@
 # Use      : Convenient Functions for Monolix Runs 
 # Author   : Tomas Sou (souto1)
 # Created  : 2025-10-30
-# Updated  : 2026-04-15
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Notes 
 # - na
