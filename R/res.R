@@ -113,7 +113,7 @@ get_ofv = function(mlxrun){
       BIC = NA,
       BICc = NA,
     ) 
-    cat(paste0("\nNo log-likelihoood for: ",basename(mlxrun),"\n"))
+    cat(paste0("\nNo log-likelihoood: ",basename(mlxrun),"\n"))
     return(ofvs)
   } 
   ofvs = 
@@ -184,7 +184,7 @@ get_para = function(mlxrun){
   fname = get_fname_para(mlxrun) 
   len = 0
   if(file.exists(fname)) len = readLines(fname,warn=FALSE) |> length()  
-  if(!file.exists(fname)|len==0) return(paste0("\nNo parameters for: ",basename(mlxrun),"\n"))
+  if(!file.exists(fname)|len==0) return(paste0("\nNo parameters: ",basename(mlxrun),"\n"))
   para = readr::read_csv(fname,show_col_types=FALSE) |> 
     dplyr::select(
       PARA = parameter, 
