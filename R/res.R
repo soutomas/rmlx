@@ -225,16 +225,16 @@ get_ofv_all = function(mlxruns,ref=NULL,sortby=c("none","OFV","AIC","BIC","BICc"
     dplyr::mutate(dBICc=BICc-dplyr::lag(BICc), .after=BICc) |>
     dplyr::mutate(dBIC=BIC-dplyr::lag(BIC), .after=BIC) |>
     dplyr::mutate(ROW = dplyr::row_number(), .before=1) |>
-    dplyr::mutate(REF = ifelse(ROW==1,"Y",""),.before=2)     
+    dplyr::mutate(REF = ifelse(ROW==1,">",""),.before=2)     
   if(!is.null(ref)){
-    allofv = allofv |> dplyr::mutate(REF = ifelse(grepl(ref,RUN),"Y",""))
+    allofv = allofv |> dplyr::mutate(REF = ifelse(grepl(ref,RUN),">",""))
   }
   allofv = allofv |> 
     dplyr::mutate(
-      rOFV = ifelse(REF=="Y",OFV,NA),
-      rAIC = ifelse(REF=="Y",AIC,NA),
-      rBIC = ifelse(REF=="Y",BIC,NA),
-      rBICc = ifelse(REF=="Y",BICc,NA),
+      rOFV = ifelse(REF==">",OFV,NA),
+      rAIC = ifelse(REF==">",AIC,NA),
+      rBIC = ifelse(REF==">",BIC,NA),
+      rBICc = ifelse(REF==">",BICc,NA),
     ) |> 
     tidyr::fill(rOFV,rAIC,rBIC,rBICc,.direction="down") |> 
     dplyr::mutate(

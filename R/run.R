@@ -26,6 +26,9 @@ utils::globalVariables(c(
 #' run_mlx("r01_model.mlxtran")
 #' }
 run_mlx = function(mlx_tran,mlx_dir,wait=F){
+  # Mlxtran 
+  if(!grepl(".mlxtran",mlx_tran)) mlx_tran = paste0(mlx_tran,".mlxtran")  
+  
   # Options 
   mlx_opt = "; mlxbsub -V 2023 -N 4 -n 12 -p "
   cmd = paste0("module purge; cd ",mlx_dir,mlx_opt,mlx_tran)
@@ -33,6 +36,7 @@ run_mlx = function(mlx_tran,mlx_dir,wait=F){
   tstart = Sys.time()
   jobID = trimws(sub("bjobs", "", out[6]))
   print(out)
+  
   # Wait 
   if(wait){
     # Wait until finish - max 4320 min (72 hr)
@@ -44,7 +48,7 @@ run_mlx = function(mlx_tran,mlx_dir,wait=F){
     trun = difftime(tend, tstart, units="secs") |> as.double() |> round(2)
     cat("Job done! [sec]:", trun)  
   }
-  # Return 
+  
   return(jobID)
 }
 
