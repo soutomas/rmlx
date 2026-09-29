@@ -4,10 +4,12 @@
 \alias{see_runs}
 \title{See summary of run results as kables}
 \usage{
-see_runs(runnums, path = ".", ...)
+see_runs(runnums, ref, path = ".", ...)
 }
 \arguments{
 \item{runnums}{\verb{<chr>} String to search for in Monolix file names separated by '|'.}
+
+\item{ref}{\verb{<chr>} String to search for Monolix file as the reference run.}
 
 \item{path}{\verb{<chr>} Location of Monolix run files.}
 

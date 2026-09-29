@@ -11,7 +11,7 @@ get_mlx(path = ".", runnums, man = FALSE)
 
 \item{runnums}{\verb{<chr>} String to search for in Monolix file names separated by '|'.}
 
-\item{man}{\verb{<lgl>} \code{TRUE} to return all model files in the directory.}
+\item{man}{\verb{<lgl>} \code{TRUE} for manual selection.}
 }
 \value{
 A character vector containing the names of the model files.

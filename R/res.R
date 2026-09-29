@@ -11,19 +11,19 @@
 # - na 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Global variables 
-utils::globalVariables(c(
-  "Values","Value","value",
-  "CV","PARA","OFV","AIC","BIC","BICc",
-  "X2","X3","parameter",
-  "run",
-  "criteria","standardError"
-))
+utils::globalVariables(paste(expression(
+  Values,Value,value,
+  CV,PARA,OFV,AIC,BIC,BICc,
+  X2,X3,parameter,
+  run,criteria,standardError,
+  ROW,REF,RUN,rAIC,rBIC,rBICc,rOFV
+)))
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #' Search for Monolix model files 
 #'
 #' @param path `<chr>` Path to the directory of the model files. 
 #' @param runnums `<chr>` String to search for in Monolix file names separated by '|'.
-#' @param man `<lgl>` `TRUE` to return all model files in the directory. 
+#' @param man `<lgl>` `TRUE` for manual selection. 
 #' @return A character vector containing the names of the model files.
 #' @export
 #' @examples
@@ -205,15 +205,16 @@ get_para = function(mlxrun){
 #'
 #' @param mlxruns `<chr>` A vector containing the model file names. 
 #' @param sortby `<chr>` Sort results by: "none", "OFV", "AIC", "BICc".
+#' @param ref `<chr>` String to search for Monolix file as the reference run.
 #' @returns A data frame containing the objective function values of the models. 
 #' @export
 #' @examples
 #' \dontrun{
-#' get_allofv("r01_model.mlxtran")
+#' get_ofv_all("r01_model.mlxtran")
 #'}
-get_allofv = function(mlxruns, sortby=c("none","OFV","AIC","BIC","BICc")){
+get_ofv_all = function(mlxruns,ref=NULL,sortby=c("none","OFV","AIC","BIC","BICc")){
   sortby = match.arg(sortby)
-  allofv = purrr::map_df(mlxruns, get_ofv)  
+  allofv = purrr::map_df(mlxruns, get_ofv) 
   if(sortby=="OFV") allofv = allofv |> dplyr::arrange(OFV) 
   if(sortby=="AIC") allofv = allofv |> dplyr::arrange(AIC) 
   if(sortby=="BIC") allofv = allofv |> dplyr::arrange(BIC) 
@@ -222,8 +223,27 @@ get_allofv = function(mlxruns, sortby=c("none","OFV","AIC","BIC","BICc")){
     dplyr::mutate(dOFV=OFV-dplyr::lag(OFV), .after=OFV) |>
     dplyr::mutate(dAIC=AIC-dplyr::lag(AIC), .after=AIC) |>
     dplyr::mutate(dBICc=BICc-dplyr::lag(BICc), .after=BICc) |>
-    dplyr::mutate(dBIC=BIC-dplyr::lag(BIC), .after=BIC) 
-  allofv = allofv |> dplyr::mutate(ROW = dplyr::row_number(), .before=1) 
+    dplyr::mutate(dBIC=BIC-dplyr::lag(BIC), .after=BIC) |>
+    dplyr::mutate(ROW = dplyr::row_number(), .before=1) |>
+    dplyr::mutate(REF = ifelse(ROW==1,"Y",""),.before=2)     
+  if(!is.null(ref)){
+    allofv = allofv |> dplyr::mutate(REF = ifelse(grepl(ref,RUN),"Y",""))
+  }
+  allofv = allofv |> 
+    dplyr::mutate(
+      rOFV = ifelse(REF=="Y",OFV,NA),
+      rAIC = ifelse(REF=="Y",AIC,NA),
+      rBIC = ifelse(REF=="Y",BIC,NA),
+      rBICc = ifelse(REF=="Y",BICc,NA),
+    ) |> 
+    tidyr::fill(rOFV,rAIC,rBIC,rBICc,.direction="down") |> 
+    dplyr::mutate(
+      dOFV = OFV-rOFV,
+      dAIC = AIC-rAIC,
+      dBIC = BIC-rBIC,
+      dBICc = BICc-rBICc,
+    ) |> 
+    dplyr::select(-c(rOFV,rAIC,rBIC,rBICc))
   return(allofv)
 }
 
@@ -235,9 +255,9 @@ get_allofv = function(mlxruns, sortby=c("none","OFV","AIC","BIC","BICc")){
 #' @export
 #' @examples
 #' \dontrun{
-#' get_allpara("r01_model.mlxtran")
+#' get_para_all("r01_model.mlxtran")
 #'}
-get_allpara = function(mlxruns){
+get_para_all = function(mlxruns){
   allpara = purrr::map(mlxruns,get_para)
   names(allpara) = basename(mlxruns)
   return(allpara)
@@ -314,9 +334,9 @@ see_para = function(addto=NULL,run1=NA,run2=NA,rse=TRUE,cv=FALSE,mlxruns){
 #' @export
 #' @examples
 #' \dontrun{
-#' see_allpara("r01_model.mlxtran") 
+#' see_para_all("r01_model.mlxtran") 
 #' }
-see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
+see_para_all = function(mlxruns,rse=TRUE,cv=FALSE){
   # extract run number 
   # runs = substr(mlxruns,1,3) 
   runs = 
@@ -339,6 +359,7 @@ see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' Examine objective function and parameter values of selected runs 
 #'
 #' @param runnums `<chr>` String to search for in Monolix file names separated by '|'.
+#' @param ref `<chr>` String to search for Monolix file as the reference run.
 #' @param path `<chr>` Path to model directory for [get_mlx].
 #' @param ifOFV `<lgl>` `TRUE` to return objective function values.
 #' @param sortby `<chr>` Sort results by: "none", "OFV", "AIC", "BICc".
@@ -352,7 +373,7 @@ see_allpara = function(mlxruns,rse=TRUE,cv=FALSE){
 #' exam_runs("/r01|/r02") # model names include "/r01" and "/r02"
 #' exam_runs("^r01|^r02") # model names starting with "r01" and "r02"
 #' }
-exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("none","OFV","AIC","BIC","BICc")){
+exam_runs = function(runnums,ref,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("none","OFV","AIC","BIC","BICc")){
   sortby = match.arg(sortby)  
   # Get all runs in the directory 
   mlxruns = get_mlx(path) 
@@ -361,10 +382,10 @@ exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("none","
   runs = grep(runnums,mlxruns,value=TRUE) |> stringr::str_sort(numeric=TRUE) 
   # Get all OFVs
   ofv = NULL
-  if(ifOFV) ofv = get_allofv(runs,sortby=sortby) 
+  if(ifOFV) ofv = get_ofv_all(runs,ref=ref,sortby=sortby) 
   # Get all parameters 
   para = NULL
-  if(ifParam) para = see_allpara(runs,rse=TRUE)
+  if(ifParam) para = see_para_all(runs,rse=TRUE)
   out = list(ofv=ofv,para=para) 
   return(out)
 } 
@@ -373,6 +394,7 @@ exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("none","
 #' See summary of run results as kables
 #'
 #' @param runnums `<chr>` String to search for in Monolix file names separated by '|'.
+#' @param ref `<chr>` String to search for Monolix file as the reference run.
 #' @param path `<chr>` Location of Monolix run files.
 #' @param ... Additional arguments for [exam_runs()]
 #' @returns A list containing the OFV and parameter values of the selected models.
@@ -384,8 +406,8 @@ exam_runs = function(runnums,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("none","
 #' see_runs("/r01|/r02") # model names include "/r01" and "/r02"
 #' see_runs("^r01|^r02") # model names starting with "r01" and "r02"
 #' }
-see_runs = function(runnums,path=".",...){
-  out = exam_runs(runnums=runnums,path=path,...)
+see_runs = function(runnums,ref,path=".",...){
+  out = exam_runs(runnums=runnums,ref=ref,path=path,...)
   out$ofv  |> edar::kb() |> print()
   out$para |> edar::kb() |> print()
   invisible(out)

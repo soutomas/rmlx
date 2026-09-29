@@ -6,6 +6,7 @@
 \usage{
 exam_runs(
   runnums,
+  ref,
   path = ".",
   ifOFV = TRUE,
   ifParam = TRUE,
@@ -14,6 +15,8 @@ exam_runs(
 }
 \arguments{
 \item{runnums}{\verb{<chr>} String to search for in Monolix file names separated by '|'.}
+
+\item{ref}{\verb{<chr>} String to search for Monolix file as the reference run.}
 
 \item{path}{\verb{<chr>} Path to model directory for \link{get_mlx}.}
 
