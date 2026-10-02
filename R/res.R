@@ -408,8 +408,8 @@ exam_runs = function(runnums,ref,path=".",ifOFV=TRUE,ifParam=TRUE, sortby=c("non
 #' }
 see_runs = function(runnums,ref,path=".",...){
   out = exam_runs(runnums=runnums,ref=ref,path=path,...)
-  out$ofv  |> edar::kb() |> print()
-  out$para |> edar::kb() |> print()
+  out$ofv  |> edar::kb(sig=8) |> print()
+  out$para |> edar::kb(sig=3) |> print()
   invisible(out)
 }
 
